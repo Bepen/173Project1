@@ -3,7 +3,6 @@
  * Creator: George Ferguson
  * Created: Thu Aug  3 17:36:24 2017
  * Time-stamp: <Tue Aug  8 10:11:39 EDT 2017 ferguson>
- *heello
  * IntSet implemented as a bit vector.
  * Using long long should allow values from 0 to 63.
  */
