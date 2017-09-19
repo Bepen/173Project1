@@ -95,10 +95,10 @@ extern void NFA_add_transition_all(NFA* nfa, int src, int dst){
     }
 }
 
-/**
- * Set whether the given NFA's state is accepting or not.
- */
-extern void NFA_set_accepting(NFA* nfa, int state, bool value);
+
+extern void NFA_set_accepting(NFA* nfa, int state, bool value){
+
+}
 
 /**
  * Return true if the given NFA's state is an accepting state.
@@ -109,7 +109,9 @@ extern bool NFA_get_accepting(NFA* nfa, int state);
  * Run the given NFA on the given input string, and return true if it accepts
  * the input, otherwise false.
  */
-extern bool NFA_execute(NFA* nfa, char *input);
+extern bool NFA_execute(NFA* nfa, char *input){
+
+}
 
 /**
  * Print the given NFA to System.out.
@@ -128,9 +130,11 @@ int main(int argc, char* argv[]) {
 
     NFA* testNFA = NFA_new(2);
 
-    NFA_add_transition(testNFA, 0, 'a', 1);
-    NFA_add_transition(testNFA, 0, 'b', 1);
+    NFA_add_transition(testNFA, 0, 'm', 1);
+    NFA_add_transition(testNFA, 1, 'a', 2);
+    NFA_add_transition(testNFA, 2, 'n', 3);
     NFA_add_transition_all(testNFA, 0, 0);
+    NFA_set_accepting(testNFA, 3);
 
     for(int i = 0; i < 128; i++){
         printf("i: %d ", i);
