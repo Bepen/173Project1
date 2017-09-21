@@ -140,9 +140,7 @@ extern bool DFA_execute(DFA* dfa, char *input){
  * Print the given DFA to System.out.
  */
 extern void DFA_print(DFA* dfa){
-    for(int i = 0; i < dfa->numOfStates; i++){
-        printf("%d", 5);
-    }
+    
 }
 extern void problem_1_a() {
     printf("Problem 1a (Only the string ab)--------------------------------------------\n");
@@ -152,6 +150,7 @@ extern void problem_1_a() {
     DFA_set_transition(problem1a, 0, 'a', 1);
     DFA_set_transition(problem1a, 1, 'b', 2);
     DFA_set_accepting(problem1a, 2, true);
+
 
     while (1) {
         DFA_set_current_state(problem1a, 0);
@@ -329,4 +328,3 @@ int main(int argc, char* argv[]) {
 }
 
 #endif
-

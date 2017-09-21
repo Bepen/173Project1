@@ -255,40 +255,49 @@ extern void problem_2_b(){
     NFA_add_transition(problem2b, 0, 'a', 1);
     NFA_set_transition_exception(problem2b, 1, 1, "a");
     NFA_add_transition(problem2b, 1, 'a', 2);
+    NFA_add_transition_all(problem2b, 2, 2);
 
     NFA_add_transition(problem2b, 0, 'g', 3);
     NFA_set_transition_exception(problem2b, 3, 3, "g");
     NFA_add_transition(problem2b, 3, 'g', 4);
+    NFA_add_transition_all(problem2b, 4, 4);
 
     NFA_add_transition(problem2b, 0, 'h', 5);
     NFA_set_transition_exception(problem2b, 5, 5, "h");
     NFA_add_transition(problem2b, 5, 'h', 6);
+    NFA_add_transition_all(problem2b, 6, 6);
 
     NFA_add_transition(problem2b, 0, 'i', 7);
     NFA_set_transition_exception(problem2b, 7, 7, "i");
     NFA_add_transition(problem2b, 7, 'i', 8);
+    NFA_add_transition_all(problem2b, 8, 8);
 
     NFA_add_transition(problem2b, 0, 'n', 9);
     NFA_set_transition_exception(problem2b, 9, 9, "n");
     NFA_add_transition(problem2b, 9, 'n', 10);
     NFA_set_transition_exception(problem2b, 10, 10, "n");
     NFA_add_transition(problem2b, 10, 'n', 11);
+    NFA_add_transition_all(problem2b, 11, 11);
 
     NFA_add_transition(problem2b, 0, 'o', 12);
     NFA_set_transition_exception(problem2b, 12, 12, "o");
     NFA_add_transition(problem2b, 12, 'o', 13);
+    NFA_add_transition_all(problem2b, 13, 13);
 
     NFA_add_transition(problem2b, 0, 's', 14);
     NFA_set_transition_exception(problem2b, 14, 14, "s");
     NFA_add_transition(problem2b, 14, 's', 15);
+    NFA_add_transition_all(problem2b, 15, 15);
 
     NFA_add_transition(problem2b, 0, 't', 16);
     NFA_set_transition_exception(problem2b, 16, 16, "t");
     NFA_add_transition(problem2b, 16, 't', 17);
+    NFA_add_transition_all(problem2b, 17, 17);
 
     NFA_add_transition(problem2b, 0, 'w', 18);
     NFA_set_transition_exception(problem2b, 18, 18, "w");
     NFA_add_transition(problem2b, 18, 'w', 19);
+    NFA_add_transition_all(problem2b, 19, 19);
 
     NFA_set_accepting(problem2b, 2, true);
     NFA_set_accepting(problem2b, 4, true);
@@ -308,7 +317,7 @@ extern void problem_2_b(){
         scanf("%s", input);
 
         if (strncmp(input, "quit", 4) == 0) {
-            printf("Quitting Problem 2a\n");
+            printf("Quitting Problem 2b\n");
             break;
         }
 
