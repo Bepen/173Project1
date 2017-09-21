@@ -85,6 +85,7 @@ extern bool IntSetIterator_has_next(const IntSetIterator *iterator);
  */
 extern int IntSetIterator_next(IntSetIterator *iterator);
 
+extern int IntSet_retrieve_first(IntSet *set);
 /**
  * Print the given IntSet to stdout.
  */

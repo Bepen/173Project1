@@ -190,6 +190,10 @@ IntSetIterator_next(IntSetIterator *iterator) {
     }
 }
 
+int IntSet_retrieve_first(IntSet *set) {
+    return set->first->value;
+}
+
 /**
  * Print the given IntSet to stdout.
  */

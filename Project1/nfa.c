@@ -21,7 +21,7 @@
  */
 
 typedef struct{
-    IntSet *transition[128];
+    IntSet* transition[128];
     bool isAccepting;
 } STATES;
 
@@ -156,12 +156,20 @@ extern bool NFA_execute(NFA* nfa, char *input){
                 //Every state is being inserting into currentStates, which is incorrect
 
                 IntSetIterator* iterator = IntSet_iterator(nfa->stateArray[j].transition[input[i]]);
-
+                IntSet *tempSet = IntSet_new();
                 while(IntSetIterator_has_next(iterator)) {
-
-                    if (IntSet_contains(nfa->currentStates, IntSetIterator_next(iterator)) != true) {
-                        IntSet_union(nfa->currentStates, nfa->stateArray[j].transition[input[i]]);
-                    }
+                    int iteratorNext = IntSetIterator_next(iterator);
+                    if (IntSet_contains(nfa->currentStates, iteratorNext) != true) {
+                        //IntSet_union(nfa->currentStates, nfa->stateArray[j].transition[input[i]]);
+                        IntSet_union(tempSet, nfa->stateArray[j].transition[input[i]]);
+                        printf("tempSet: ");
+                        IntSet_print(tempSet);
+                        printf("\n");
+                        nfa->currentStates = tempSet;
+                        printf("tempSet after currentStates=tempSet : ");
+                        IntSet_print(tempSet);
+                        printf("\n");
+                   }
 
                 }
             }
@@ -178,6 +186,44 @@ extern bool NFA_execute(NFA* nfa, char *input){
             }
     }
     printf("false");
+    return false;
+}
+
+extern IntSet* give_int_set(NFA* nfa, char input, int state) {
+    return nfa->stateArray[state].transition[input];
+}
+
+extern bool NFA_execute2(NFA* nfa, char *input){
+    IntSet* tempSet = IntSet_new();
+    IntSet* beginSet = IntSet_new();
+    IntSet_add(tempSet, 0);
+    IntSet* middleSet;
+    for (int i = 0; input[i] != '\0'; i++) {
+        beginSet = tempSet;
+        IntSetIterator* iterator = IntSet_iterator(beginSet);
+        middleSet = IntSet_new();
+        while(IntSetIterator_has_next(iterator)) {
+            int iteratorFirst = IntSetIterator_next(iterator);
+            tempSet = give_int_set(nfa, input[i], iteratorFirst);
+            IntSet_union(middleSet, tempSet);
+            if (!IntSetIterator_has_next(iterator)) {
+                tempSet = middleSet;
+                break;
+            }
+        }
+    }
+    nfa->currentStates = tempSet;
+    for(int i = 0; i < nfa->numOfAcceptingStates; i++){
+        if (IntSet_contains(nfa->currentStates, nfa->acceptingStates[i])){
+            //printf("Accepting states: %d\n", nfa->acceptingStates[i]);
+            //printf("current states set: ");
+            //IntSet_print(nfa->currentStates);
+
+            //printf("\ntrue\n");
+            return true;
+        }
+    }
+    //printf("false");
     return false;
 }
 
@@ -198,24 +244,26 @@ int main(int argc, char* argv[]) {
 
     problem_2_a();
     NFA* testNFA = NFA_new(4);
-
+    //IntSet_print(testNFA->stateArray[1].transition['a']);
     NFA_add_transition(testNFA, 0, 'm', 1);
     NFA_add_transition(testNFA, 1, 'a', 2);
     NFA_add_transition(testNFA, 2, 'n', 3);
     NFA_add_transition_all(testNFA, 0, 0);
     NFA_set_accepting(testNFA, 3, true);
-    NFA_execute(testNFA, "many");
-   /* for (int j = 0; j < testNFA->numOfStates; j++) {
+    printf("Evaluation: %d\n", NFA_execute2(testNFA, "maan"));
+    /*
+    for (int j = 0; j < testNFA->numOfStates; j++) {
         for (int i = 0; i < 128; i++) {
             if (IntSet_is_empty(testNFA->stateArray[j].transition[i]) != true) {
                 printf("State: %d\n", j);
                 printf("c: %c ", i);
                 IntSet_print(testNFA->stateArray[j].transition[i]);
                 printf("\n");
-        }
+            }
         }
     }
-    */
+     */
+
 }
 
 #endif
