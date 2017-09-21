@@ -69,11 +69,10 @@ extern bool NFA_get_accepting(NFA* nfa, int state);
  * Run the given NFA on the given input string, and return true if it accepts
  * the input, otherwise false.
  */
-extern bool NFA_execute(NFA* nfa, char *input);
 
 extern IntSet* give_int_set(NFA* nfa, char input, int state);
 
-extern bool NFA_execute2(NFA* nfa, char *input);
+extern bool NFA_execute(NFA* nfa, char *input);
 
 /**
  * Print the given NFA to System.out.
