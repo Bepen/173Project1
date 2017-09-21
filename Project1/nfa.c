@@ -333,10 +333,48 @@ extern void problem_2_b(){
 
 }
 
+extern void problem_2_c(){
+    printf("Problem 2c (Strings with 'code' anywhere in it)--------------------------------------------\n");
+    printf("Only accepts 64 characters\n");
+    printf("Enter quit to exit the problem\n");
+    NFA* problem2c = NFA_new(5);
+
+    NFA_add_transition_all(problem2c, 0, 0);
+    NFA_add_transition(problem2c, 0, 'c', 1);
+    NFA_add_transition(problem2c, 1, 'o', 2);
+    NFA_add_transition(problem2c, 2, 'd', 3);
+    NFA_add_transition(problem2c, 3, 'e', 4);
+    NFA_add_transition_all(problem2c, 4, 4);
+    NFA_set_accepting(problem2c, 4, true);
+
+
+    while (1) {
+        NFA_set_current_state(problem2c, 0);
+        char *input = malloc(64*sizeof(char));
+        printf("Test: ");
+        scanf("%s", input);
+
+        if (strncmp(input, "quit", 4) == 0) {
+            printf("Quitting Problem 2a\n");
+            break;
+        }
+
+        int test = NFA_execute(problem2c, input);
+        if (test == 0) {
+            printf("%s is not accepted\n", input);
+        }
+        if (test == 1) {
+            printf("%s is accepted\n", input);
+        }
+    }
+    printf("\n");
+
+}
 
 int main(int argc, char* argv[]) {
     problem_2_a();
     problem_2_b();
+    problem_2_c();
 
 
 
