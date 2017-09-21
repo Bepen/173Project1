@@ -13,7 +13,6 @@
 #include <stdbool.h>
 #include "IntSet.h"
 #include "nfa.h"
-#include "IntSet.c"
 
 /**
  * The data structure used to represent a nondeterministic finite automaton.
@@ -22,13 +21,15 @@
  */
 
 typedef struct{
-    IntSet transition[128];
+    IntSet *transition[128];
     bool isAccepting;
 } STATES;
 
 typedef struct{
     int numOfStates;
-    IntSet currentStates;
+    int numOfAcceptingStates;
+    IntSet *currentStates;
+    int *acceptingStates;
     STATES *stateArray;
 } NFA;
 
@@ -38,14 +39,22 @@ typedef struct{
 extern NFA* NFA_new(int nstates){
     NFA *nfa = (NFA*)malloc(sizeof(NFA));
     nfa->numOfStates = nstates;
-    //Create a set for the current possible states, and adding 0 to that Set.
     nfa->currentStates = IntSet_new();
     IntSet_add(nfa->currentStates, 0);
-
+    nfa->numOfAcceptingStates = 0;
     nfa->stateArray = (STATES *)malloc(nstates*sizeof(STATES));
-
-    for(int i = 0; i < 128; i++){
-        nfa->stateArray->transition[i] = IntSet_new();
+    nfa->acceptingStates = (int *)malloc(nstates*sizeof(int));
+    //Initialize the accepting state array to "NULL"
+    for(int i = 0; i < nstates; i++){
+        nfa->acceptingStates[i] = -1;
+    }
+    for (int i = 0; i < nstates; i++) {
+        nfa->stateArray[i].isAccepting = false;
+    }
+    for (int i = 0; i < nstates; i++) {
+        for (int j = 0; j < 128; j++) {
+            nfa->stateArray[i].transition[j] = IntSet_new();
+        }
     }
 
     return nfa;
@@ -59,26 +68,35 @@ extern void NFA_free(NFA* nfa);
 /**
  * Return the number of states in the given NFA.
  */
-extern int NFA_get_size(NFA* nfa);
+extern int NFA_get_size(NFA* nfa){
+    return nfa->numOfStates;
+}
 
 /**
  * Return the set of next states specified by the given NFA's transition
  * function from the given state on input symbol sym.
  */
-extern IntSet NFA_get_transitions(NFA* nfa, int state, char sym);
+extern IntSet* NFA_get_transitions(NFA* nfa, int state, char sym){
+    return nfa->stateArray[state].transition[sym];
+}
 
 /**
  * For the given NFA, add the state dst to the set of next states from
  * state src on input symbol sym.
  */
 extern void NFA_add_transition(NFA* nfa, int src, char sym, int dst){
-        IntSet_add(nfa->stateArray[src].transition[sym], dst);
+    IntSet_add(nfa->stateArray[src].transition[sym], dst);
 }
 
 /**
  * Add a transition for the given NFA for each symbol in the given str.
  */
-extern void NFA_add_transition_str(NFA* nfa, int src, char *str, int dst);
+extern void NFA_add_transition_str(NFA* nfa, int src, char *str, int dst){
+    for (int i = 0; str[i] != '\0'; i++) {
+        IntSet_add(nfa->stateArray[src].transition[str[i]], dst);
+
+    }
+}
 
 /**
  * Add a transition for the given NFA for each input symbol.
@@ -98,18 +116,70 @@ extern void NFA_add_transition_all(NFA* nfa, int src, int dst){
 /**
  * Set whether the given NFA's state is accepting or not.
  */
-extern void NFA_set_accepting(NFA* nfa, int state, bool value);
+extern void NFA_set_accepting(NFA* nfa, int state, bool value) {
+    nfa->stateArray[state].isAccepting = value;
+    nfa->numOfAcceptingStates++;
+    for(int i = 0; i < nfa->numOfAcceptingStates; i++){
+        if(nfa->acceptingStates[i] == -1){
+            nfa->acceptingStates[i] = state;
+            break;
+        }
+    }
+}
 
 /**
  * Return true if the given NFA's state is an accepting state.
  */
-extern bool NFA_get_accepting(NFA* nfa, int state);
+extern bool NFA_get_accepting(NFA* nfa, int state) {
+    return nfa->stateArray[state].isAccepting;
+}
+
+void NFA_set_current_state(NFA* nfa, int statenum){
+    IntSet *stateSet = IntSet_new();
+    IntSet_add(stateSet, statenum);
+    if (IntSet_is_empty(nfa->currentStates)) {
+
+    };
+}
+
 
 /**
  * Run the given NFA on the given input string, and return true if it accepts
  * the input, otherwise false.
  */
-extern bool NFA_execute(NFA* nfa, char *input);
+extern bool NFA_execute(NFA* nfa, char *input){
+    for (int j = 0; j < nfa->numOfStates; j++) {
+        for (int i = 0; input[i] != '\0'; i++) {
+            //if (IntSet_is_empty(nfa->stateArray[j].transition[i]) != true) {
+            if (IntSet_is_empty(nfa->stateArray[j].transition[input[i]]) != true) {
+
+                //Every state is being inserting into currentStates, which is incorrect
+
+                IntSetIterator* iterator = IntSet_iterator(nfa->stateArray[j].transition[input[i]]);
+
+                while(IntSetIterator_has_next(iterator)) {
+
+                    if (IntSet_contains(nfa->currentStates, IntSetIterator_next(iterator)) != true) {
+                        IntSet_union(nfa->currentStates, nfa->stateArray[j].transition[input[i]]);
+                    }
+
+                }
+            }
+        }
+    }
+    for(int i = 0; i < nfa->numOfAcceptingStates; i++){
+            if (IntSet_contains(nfa->currentStates, nfa->acceptingStates[i])){
+                printf("Accepting states: %d\n", nfa->acceptingStates[i]);
+                printf("current states set: ");
+                IntSet_print(nfa->currentStates);
+
+                printf("\ntrue\n");
+                return true;
+            }
+    }
+    printf("false");
+    return false;
+}
 
 /**
  * Print the given NFA to System.out.
@@ -126,17 +196,26 @@ extern void problem_2_a(){
 
 int main(int argc, char* argv[]) {
 
-    NFA* testNFA = NFA_new(2);
+    problem_2_a();
+    NFA* testNFA = NFA_new(4);
 
-    NFA_add_transition(testNFA, 0, 'a', 1);
-    NFA_add_transition(testNFA, 0, 'b', 1);
+    NFA_add_transition(testNFA, 0, 'm', 1);
+    NFA_add_transition(testNFA, 1, 'a', 2);
+    NFA_add_transition(testNFA, 2, 'n', 3);
     NFA_add_transition_all(testNFA, 0, 0);
-
-    for(int i = 0; i < 128; i++){
-        printf("i: %d ", i);
-        IntSet_print(testNFA->stateArray->transition[i]);
-        printf("\n");
+    NFA_set_accepting(testNFA, 3, true);
+    NFA_execute(testNFA, "many");
+   /* for (int j = 0; j < testNFA->numOfStates; j++) {
+        for (int i = 0; i < 128; i++) {
+            if (IntSet_is_empty(testNFA->stateArray[j].transition[i]) != true) {
+                printf("State: %d\n", j);
+                printf("c: %c ", i);
+                IntSet_print(testNFA->stateArray[j].transition[i]);
+                printf("\n");
+        }
+        }
     }
+    */
 }
 
 #endif

@@ -1,74 +1,111 @@
 /*
- * File: IntSet2.c
+ * File: IntSet.c
  * Creator: George Ferguson
- * Created: Thu Aug  3 17:36:24 2017
- * Time-stamp: <Tue Aug  8 10:11:39 EDT 2017 ferguson>
- *heello
- * IntSet implemented as a bit vector.
- * Using long long should allow values from 0 to 63.
+ * Created: Fri Jul  1 09:51:18 2016
+ * Time-stamp: <Wed Sep  7 17:58:37 EDT 2016 ferguson>
+ *
+ * Implementation of Set of ints as a simple linked list.
+ * Adding to the set means adding at the front since that's cheapest.
+ * Lookup (and hence add) is linear-time. You could do much better...
  */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "IntSet.h"
 
-typedef unsigned long long int intset_t;
-
+/**
+ * Toplevel structure for an IntSet.
+ * This implementation simply uses a linked list.
+ */
 struct IntSet {
-    intset_t bits;
+    struct IntSetNode *first;
+    struct IntSetNode *last;
 };
 
-#define NUMBITS (sizeof(intset_t)*8)
+struct IntSetIterator {
+    struct IntSetNode *node;
+};
+
+/**
+ * Structure for each element in an IntSet, stored as a linked list.
+ */
+typedef struct IntSetNode {
+    int value;
+    struct IntSetNode *next;
+} IntSetNode;
 
 /**
  * Allocate, initialize and return a new (empty) IntSet.
  */
-IntSet
+IntSet *
 IntSet_new() {
-    IntSet this = (IntSet)malloc(sizeof(struct IntSet));
-    this->bits = 0;
-    return this;
+    IntSet *set = (IntSet*)malloc(sizeof(IntSet));
+    set->first = set->last = NULL;
+    return set;
 }
 
 /**
  * Free the memory used for the given IntSet and all its elements.
  */
 void
-IntSet_free(IntSet set) {
-    if (set != NULL) {
-	free(set);
+IntSet_free(IntSet *set) {
+    // Free the elements
+    IntSetNode *elt = set->first;
+    while (elt != NULL) {
+        IntSetNode *next = elt->next;
+        free(elt);
+        elt = next;
     }
+    // Free the set (list)
+    free(set);
+}
+
+/**
+ * Allocate and initialize a new IntSetNode storing the given int value.
+ */
+static IntSetNode *
+IntSetNode_new(int value) {
+    IntSetNode *node = (IntSetNode*)malloc(sizeof(IntSetNode));
+    if (node == NULL) {
+        abort();
+    }
+    node->value = value;
+    node->next = NULL;
+    return node;
 }
 
 /**
  * Return true if the given IntSet is empty.
  */
 bool
-IntSet_is_empty(const IntSet set) {
-    return set->bits == 0;
+IntSet_is_empty(const IntSet *set) {
+    return set->first == NULL;
 }
 
 /**
  * Add given int to the given IntSet (if it's not already there).
- * We keep the list sorted (so it prints nicely).
  */
 void
-IntSet_add(IntSet set, int value) {
-    // Range check
-    if(value < 0){
-        //if (value < 0 || value >= NUMBITS) {
-        fprintf(stderr, "IntSet_add: value out of range: %d\n", value);
-        abort();
+IntSet_add(IntSet *set, int value) {
+    if (!IntSet_contains(set, value)) {
+        // Add at front
+        IntSetNode *node = IntSetNode_new(value);
+        node->next = set->first;
+        set->first = node;
     }
-    set->bits |= (1L << value);
 }
 
 /**
  * Return true if the given IntSet contains the given int value.
  */
 bool
-IntSet_contains(const IntSet set, int value) {
-    return set->bits & (1L << value);
+IntSet_contains(const IntSet *set, int value) {
+    for (IntSetNode *node=set->first; node != NULL; node=node->next) {
+        if (node->value == value) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -77,8 +114,10 @@ IntSet_contains(const IntSet set, int value) {
  * (or all its elements are already in set1).
  */
 void
-IntSet_union(IntSet set1, const IntSet set2) {
-    set1->bits |= set2->bits;
+IntSet_union(IntSet *set1, const IntSet *set2) {
+    for (IntSetNode *node=set2->first; node != NULL; node=node->next) {
+        IntSet_add(set1, node->value);
+    }
 }
 
 /**
@@ -86,17 +125,22 @@ IntSet_union(IntSet set1, const IntSet set2) {
  * IntSet.
  */
 bool
-IntSet_contains_all(IntSet set1, IntSet set2) {
-    return (set1->bits | set2->bits) == set1->bits;
+IntSet_contains_all(IntSet *set1, IntSet *set2) {
+    for (IntSetNode *node2=set2->first; node2 != NULL; node2=node2->next) {
+        if (!IntSet_contains(set1, node2->value)) {
+            return false;
+        }
+    }
+    return true;
 }
-    
+
 /**
  * Return true if the two given IntSets contain exactly the same members,
  * otherwise false.
  */
 bool
-IntSet_equals(IntSet set1, IntSet set2) {
-    return set1->bits == set2->bits;
+IntSet_equals(IntSet *set1, IntSet *set2) {
+    return IntSet_contains_all(set1, set2) && IntSet_contains_all(set2, set1);
 }
 
 /**
@@ -104,60 +148,45 @@ IntSet_equals(IntSet set1, IntSet set2) {
  * int value to the function.
  */
 void
-IntSet_iterate(const IntSet set, void (*func)(int)) {
-    for (int i=0; i < NUMBITS; i++) {
-	if (IntSet_contains(set, i)) {
-	    func(i);
-	}
+IntSet_iterate(const IntSet *set, void (*func)(int)) {
+    for (IntSetNode *node=set->first; node != NULL; node=node->next) {
+        func(node->value);
     }
 }
-
-struct IntSetIterator {
-    IntSet set;
-    int index;
-};
 
 /**
  * Return an IntSetIterator for the given IntSet.
  * Don't forget to free() this when you're done iterating.
  */
-IntSetIterator
-IntSet_iterator(const IntSet set) {
-    IntSetIterator iterator = (IntSetIterator)malloc(sizeof(struct IntSetIterator));
-    iterator->set = set;
-    iterator->index = 0;
+
+IntSetIterator *
+IntSet_iterator(const IntSet *set) {
+    IntSetIterator *iterator = (IntSetIterator*)malloc(sizeof(IntSetIterator));
+    iterator->node = set->first;
     return iterator;
 }
 
 /**
- * Return true if the next call to IntSetIterator_next on the given
- * IntSetIterator will not fail.
+ * Return the next int from the given IntSetIterator and increment it
+ * to point to the next element.
+ * This will cause a crash if there is no such element.
+ * You could make a safe version with a pass-by-reference (int*) parameter
+ * for the int and boolean return value that indicates whether the operation
+ * succeeded or not. Ah, the goold old days...
  */
 bool
-IntSetIterator_has_next(const IntSetIterator iterator) {
-    while (iterator->index < NUMBITS) {
-	if (IntSet_contains(iterator->set, iterator->index)) {
-	    return true;
-	} else {
-	    iterator->index += 1;
-	}
-    }
-    return false;
+IntSetIterator_has_next(const IntSetIterator *iterator) {
+    return iterator != NULL && iterator->node != NULL;
 }
 
-/**
- * Return the next int in the IntSet underlying the given IntSetIterator,
- * or -1 if there is no such element.
- */
 int
-IntSetIterator_next(IntSetIterator iterator) {
-    if (IntSetIterator_has_next(iterator)) {
-	// iterator index will point to next 1 bit
-	int value = iterator->index;
-	iterator->index += 1;
-	return value;
+IntSetIterator_next(IntSetIterator *iterator) {
+    if (iterator == NULL || iterator->node == NULL) {
+        abort();
     } else {
-	return -1;
+        int value = iterator->node->value;
+        iterator->node = iterator->node->next;
+        return value;
     }
 }
 
@@ -165,49 +194,12 @@ IntSetIterator_next(IntSetIterator iterator) {
  * Print the given IntSet to stdout.
  */
 void
-IntSet_print(IntSet set) {
-    IntSetIterator iterator = IntSet_iterator(set);
-    printf("{");
-    while (IntSetIterator_has_next(iterator)) {
-	int value = IntSetIterator_next(iterator);
-	printf("%d", value);
-	if (IntSetIterator_has_next(iterator)) {
-	    printf(",");
-	}
+IntSet_print(IntSet *set) {
+    for (IntSetNode *node=set->first; node != NULL; node=node->next) {
+        printf("%d", node->value);
+        if (node->next != NULL) {
+            printf(" ");
+        }
     }
-    printf("}");
-    free(iterator);
+    printf("\n");
 }
-
-#include <string.h>
-
-/**
- * Return the string representation of the given IntSet.
- * Don't forget to free() this string.
- */
-char *
-IntSet_to_string(IntSet set) {
-    char *result = NULL;
-    IntSetIterator iterator = IntSet_iterator(set);
-    while (IntSetIterator_has_next(iterator)) {
-	int value = IntSetIterator_next(iterator);
-	char buf[8];
-	sprintf(buf, "%d", value);
-	if (IntSetIterator_has_next(iterator)) {
-	    strcat(buf, ",");
-	}
-	if (result == NULL) {
-	    result = malloc(strlen(buf)+1);
-	    strcpy(result, buf);
-	} else {
-	    char *old_result = result;
-	    result = (char*)malloc(strlen(old_result)+strlen(buf)+1);
-	    strcpy(result, old_result);
-	    strcat(result, buf);
-	    free(old_result);
-	}
-    }
-    free(iterator);
-    return result;
-}
-    

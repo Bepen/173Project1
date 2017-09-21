@@ -141,7 +141,7 @@ extern bool DFA_execute(DFA* dfa, char *input){
  */
 extern void DFA_print(DFA* dfa){
     for(int i = 0; i < dfa->numOfStates; i++){
-        printf("{%d , %d", )
+        printf("%d", 5);
     }
 }
 extern void problem_1_a() {
