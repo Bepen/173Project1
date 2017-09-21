@@ -114,6 +114,23 @@ extern void NFA_add_transition_all(NFA* nfa, int src, int dst){
     }
 }
 
+extern bool char_check_contains(char* exc, char c) {
+    for (int i = 0; exc[i] != '\0'; i++) {
+        if (exc[i] == c) {
+            return true;
+        }
+    }
+    return false;
+}
+
+extern void NFA_set_transition_exception(NFA* nfa, int src, int dst, char* exc) {
+    for (int i = 0; i < 128; i++) {
+        if (!char_check_contains(exc, i)) {
+            IntSet_add(nfa->stateArray[src].transition[i], dst);
+        }
+    }
+}
+
 /**
  * Set whether the given NFA's state is accepting or not.
  */
@@ -196,15 +213,15 @@ extern void problem_2_a(){
     printf("Problem 2a (Strings ending in man)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
     printf("Enter quit to exit the problem\n");
-    NFA* testNFA = NFA_new(4);
+    NFA* problem2a = NFA_new(4);
     //IntSet_print(testNFA->stateArray[1].transition['a']);
-    NFA_add_transition(testNFA, 0, 'm', 1);
-    NFA_add_transition(testNFA, 1, 'a', 2);
-    NFA_add_transition(testNFA, 2, 'n', 3);
-    NFA_add_transition_all(testNFA, 0, 0);
-    NFA_set_accepting(testNFA, 3, true);
+    NFA_add_transition(problem2a, 0, 'm', 1);
+    NFA_add_transition(problem2a, 1, 'a', 2);
+    NFA_add_transition(problem2a, 2, 'n', 3);
+    NFA_add_transition_all(problem2a, 0, 0);
+    NFA_set_accepting(problem2a, 3, true);
     while (1) {
-        NFA_set_current_state(testNFA, 0);
+        NFA_set_current_state(problem2a, 0);
         char *input = malloc(64*sizeof(char));
         printf("Test: ");
         scanf("%s", input);
@@ -214,7 +231,88 @@ extern void problem_2_a(){
             break;
         }
 
-        int test = NFA_execute(testNFA, input);
+        int test = NFA_execute(problem2a, input);
+        if (test == 0) {
+            printf("%s is not accepted\n", input);
+        }
+        if (test == 1) {
+            printf("%s is accepted\n", input);
+        }
+    }
+    printf("\n");
+
+}
+
+
+extern void problem_2_b(){
+    printf("Problem 2b (Strings with more than one a, g, h, i, o, s, t, or w, or more than two n’s)--------------------------------------------\n");
+    printf("Only accepts 64 characters\n");
+    printf("Enter quit to exit the problem\n");
+    NFA* problem2b = NFA_new(20);
+
+    NFA_add_transition_all(problem2b, 0, 0);
+
+    NFA_add_transition(problem2b, 0, 'a', 1);
+    NFA_set_transition_exception(problem2b, 1, 1, "a");
+    NFA_add_transition(problem2b, 1, 'a', 2);
+
+    NFA_add_transition(problem2b, 0, 'g', 3);
+    NFA_set_transition_exception(problem2b, 3, 3, "g");
+    NFA_add_transition(problem2b, 3, 'g', 4);
+
+    NFA_add_transition(problem2b, 0, 'h', 5);
+    NFA_set_transition_exception(problem2b, 5, 5, "h");
+    NFA_add_transition(problem2b, 5, 'h', 6);
+
+    NFA_add_transition(problem2b, 0, 'i', 7);
+    NFA_set_transition_exception(problem2b, 7, 7, "i");
+    NFA_add_transition(problem2b, 7, 'i', 8);
+
+    NFA_add_transition(problem2b, 0, 'n', 9);
+    NFA_set_transition_exception(problem2b, 9, 9, "n");
+    NFA_add_transition(problem2b, 9, 'n', 10);
+    NFA_set_transition_exception(problem2b, 10, 10, "n");
+    NFA_add_transition(problem2b, 10, 'n', 11);
+
+    NFA_add_transition(problem2b, 0, 'o', 12);
+    NFA_set_transition_exception(problem2b, 12, 12, "o");
+    NFA_add_transition(problem2b, 12, 'o', 13);
+
+    NFA_add_transition(problem2b, 0, 's', 14);
+    NFA_set_transition_exception(problem2b, 14, 14, "s");
+    NFA_add_transition(problem2b, 14, 's', 15);
+
+    NFA_add_transition(problem2b, 0, 't', 16);
+    NFA_set_transition_exception(problem2b, 16, 16, "t");
+    NFA_add_transition(problem2b, 16, 't', 17);
+
+    NFA_add_transition(problem2b, 0, 'w', 18);
+    NFA_set_transition_exception(problem2b, 18, 18, "w");
+    NFA_add_transition(problem2b, 18, 'w', 19);
+
+    NFA_set_accepting(problem2b, 2, true);
+    NFA_set_accepting(problem2b, 4, true);
+    NFA_set_accepting(problem2b, 6, true);
+    NFA_set_accepting(problem2b, 8, true);
+    NFA_set_accepting(problem2b, 11, true);
+    NFA_set_accepting(problem2b, 13, true);
+    NFA_set_accepting(problem2b, 15, true);
+    NFA_set_accepting(problem2b, 17, true);
+    NFA_set_accepting(problem2b, 19, true);
+
+
+    while (1) {
+        NFA_set_current_state(problem2b, 0);
+        char *input = malloc(64*sizeof(char));
+        printf("Test: ");
+        scanf("%s", input);
+
+        if (strncmp(input, "quit", 4) == 0) {
+            printf("Quitting Problem 2a\n");
+            break;
+        }
+
+        int test = NFA_execute(problem2b, input);
         if (test == 0) {
             printf("%s is not accepted\n", input);
         }
@@ -228,8 +326,8 @@ extern void problem_2_a(){
 
 
 int main(int argc, char* argv[]) {
-
     problem_2_a();
+    problem_2_b();
 
 
 

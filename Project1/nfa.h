@@ -55,6 +55,10 @@ extern void NFA_add_transition_str(NFA* nfa, int src, char *str, int dst);
  */
 extern void NFA_add_transition_all(NFA* nfa, int src, int dst);
 
+extern bool char_check_contains(char* exc, char c);
+
+extern void NFA_set_transition_exception(NFA* nfa, int src, int dst, char* exc);
+
 /**
  * Set whether the given NFA's state is accepting or not.
  */
@@ -80,5 +84,6 @@ extern bool NFA_execute(NFA* nfa, char *input);
 extern void NFA_print(NFA* nfa);
 
 extern void problem_2_a();
+extern void problem_2_b();
 
 #endif
