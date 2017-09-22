@@ -85,5 +85,6 @@ extern void NFA_print(NFA* nfa);
 
 extern void problem_2_a();
 extern void problem_2_b();
+extern void problem_2_c();
 
 #endif

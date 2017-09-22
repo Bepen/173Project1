@@ -280,7 +280,7 @@ extern void problem_1_d(){
 }
 
 extern void problem_1_e(){
-    printf("Problem 1e (Binary Input with Odd Number of 1's and 0's)--------------------------------------------\n");
+    printf("Problem 1e (Binary Input with Odd Number of 1's AND 0's)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
     printf("Enter quit to exit the problem\n");
 
@@ -318,13 +318,13 @@ extern void problem_1_e(){
     printf("\n");
 }
 
-int main(int argc, char* argv[]) {
+/*int main(int argc, char* argv[]) {
     problem_1_a();
     problem_1_b();
     problem_1_c();
     problem_1_d();
     problem_1_e();
 
-}
+}*/
 
 #endif

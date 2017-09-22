@@ -371,13 +371,13 @@ extern void problem_2_c(){
 
 }
 
-int main(int argc, char* argv[]) {
+/*int main(int argc, char* argv[]) {
     problem_2_a();
     problem_2_b();
     problem_2_c();
 
 
 
-}
+}*/
 
 #endif

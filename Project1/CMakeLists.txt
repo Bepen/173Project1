@@ -3,5 +3,5 @@ project(Project1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp dfa.c nfa.c IntSet.c IntSet.h)
+set(SOURCE_FILES main.cpp dfa.c nfa.c IntSet.c IntSet.h auto.c)
 add_executable(Project1 ${SOURCE_FILES})
