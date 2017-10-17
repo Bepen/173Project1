@@ -1,4 +1,10 @@
 /*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
+/*
  * File: nfa.h
  * Creator: George Ferguson
  * Created: Thu Sep  1 17:54:41 2016
@@ -55,8 +61,10 @@ extern void NFA_add_transition_str(NFA* nfa, int src, char *str, int dst);
  */
 extern void NFA_add_transition_all(NFA* nfa, int src, int dst);
 
+//checks if a string has a certain character
 extern bool char_check_contains(char* exc, char c);
 
+//sets transitions on all chars except for specified exceptions
 extern void NFA_set_transition_exception(NFA* nfa, int src, int dst, char* exc);
 
 /**
@@ -74,14 +82,15 @@ extern bool NFA_get_accepting(NFA* nfa, int state);
  * the input, otherwise false.
  */
 
+//gives the set a certain index
 extern IntSet* give_int_set(NFA* nfa, char input, int state);
 
+//executes NFA
 extern bool NFA_execute(NFA* nfa, char *input);
 
 /**
  * Print the given NFA to System.out.
  */
-extern void NFA_print(NFA* nfa);
 
 extern void problem_2_a();
 extern void problem_2_b();

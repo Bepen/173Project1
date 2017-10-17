@@ -1,4 +1,10 @@
 /*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
+/*
  * File: strdup.c
  * Creator: George Ferguson
  * Created: Tue Aug  8 10:05:19 2017
@@ -23,4 +29,3 @@ strdup(const char* s) {
     strcpy(t, s);
     return t;
 }
-

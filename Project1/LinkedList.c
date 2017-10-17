@@ -1,4 +1,10 @@
 /*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
+/*
  * File: LinkedList.c
  * Creator: George Ferguson
  * Created: Thu Jun 30 14:47:12 2016
@@ -145,7 +151,7 @@ LinkedList_remove(LinkedList *list, void *data) {
 	    return;
 	}
     }
-}    
+}
 
 /**
  * Return the void* value at the given index in the given LinkedList, or

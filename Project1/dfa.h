@@ -1,4 +1,10 @@
 /*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
+/*
  * File: dfa.h
  * Creator: George Ferguson
  * Created: Thu Sep  1 17:45:52 2016
@@ -88,12 +94,7 @@ extern void problem_1_e();
 
 extern void problem_2_a();
 
-
+//executes the automata
 extern bool DFA_execute(DFA* dfa, char *input);
-
-/**
- * Print the given DFA to System.out.
- */
-extern void DFA_print(DFA* dfa);
 
 #endif

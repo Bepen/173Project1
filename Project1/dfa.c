@@ -1,3 +1,9 @@
+/*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
 #ifndef _dfa_h
 #define _dfa_h
 
@@ -7,13 +13,15 @@
 #include "dfa.h"
 #include <string.h>
 
-typedef struct {
+typedef struct { //creates a STATES struct whcih includes transitions
+                 //for 128 characters
     int transition[128];
     bool isAccepting;
 
 }STATES;
 
-typedef struct {
+typedef struct { //creates a DFA struct with a variable for number of states,
+                 //what the current state is, and a pointer array of STATES
     int numOfStates;
     int currentState;
     STATES* stateArray;
@@ -91,7 +99,8 @@ extern void DFA_set_transition_all(DFA* dfa, int src, int dst){
         dfa->stateArray[src].transition[i] = dst;
     }
 }
-
+//sets the transition for all characters except for the
+//characters in exc which will not be able to transition
 extern void DFA_set_transition_exception(DFA* dfa, int src, int dst, char* exc) {
     for (int i = 0; i < 128; i++) {
         dfa->stateArray[src].transition[i] = dst;
@@ -115,6 +124,7 @@ extern bool DFA_get_accepting(DFA* dfa, int state){
     return dfa->stateArray[state].isAccepting;
 }
 
+//sets the current state of the DFA
 void DFA_set_current_state(DFA *dfa, int statenum) {
     dfa->currentState = statenum;
 }
@@ -135,13 +145,7 @@ extern bool DFA_execute(DFA* dfa, char *input){
     return DFA_get_accepting(dfa, final);
 }
 
-
-/**
- * Print the given DFA to System.out.
- */
-extern void DFA_print(DFA* dfa){
-    
-}
+//problem 1a
 extern void problem_1_a() {
     printf("Problem 1a (Only the string ab)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
@@ -151,7 +155,7 @@ extern void problem_1_a() {
     DFA_set_transition(problem1a, 1, 'b', 2);
     DFA_set_accepting(problem1a, 2, true);
 
-
+//while loop keeps making user enter input until they type quit
     while (1) {
         DFA_set_current_state(problem1a, 0);
         char *input = malloc(64*sizeof(char));
@@ -172,8 +176,9 @@ extern void problem_1_a() {
         }
     }
     printf("\n");
+    DFA_free(problem1a);
 }
-
+//problem 1b
 extern void problem_1_b() {
     printf("Problem 1b (Begins with ab)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
@@ -184,6 +189,7 @@ extern void problem_1_b() {
     DFA_set_transition_all(problem1b, 2, 2);
     DFA_set_accepting(problem1b, 2, true);
 
+//while loop keeps making user enter input until they type quit
     while (1) {
         DFA_set_current_state(problem1b, 0);
         char *input = malloc(64*sizeof(char));
@@ -204,8 +210,9 @@ extern void problem_1_b() {
         }
     }
     printf("\n");
+    DFA_free(problem1b);
 }
-
+//problem 1c
 extern void problem_1_c() {
     printf("Problem 1c (Binary Input with Even Number of 1's)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
@@ -218,6 +225,7 @@ extern void problem_1_c() {
 
     DFA_set_accepting(problem1c, 0, true);
 
+//while loop keeps making user enter input until they type quit
     while (1) {
         DFA_set_current_state(problem1c, 0);
         char *input = malloc(64*sizeof(char));
@@ -238,8 +246,10 @@ extern void problem_1_c() {
         }
     }
     printf("\n");
+    DFA_free(problem1c);
 }
 
+//problem 1d
 extern void problem_1_d(){
     printf("Problem 1d (Binary Input with Even Number of 1's and 0's)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
@@ -256,6 +266,7 @@ extern void problem_1_d(){
 
     DFA_set_accepting(problem1d, 0 , true);
 
+//while loop keeps making user enter input until they type quit
     while (1) {
         DFA_set_current_state(problem1d, 0);
         char *input = malloc(64*sizeof(char));
@@ -276,9 +287,10 @@ extern void problem_1_d(){
         }
     }
     printf("\n");
+    DFA_free(problem1d);
 
 }
-
+//problem 1e
 extern void problem_1_e(){
     printf("Problem 1e (Binary Input with Odd Number of 1's AND 0's)--------------------------------------------\n");
     printf("Only accepts 64 characters\n");
@@ -296,6 +308,7 @@ extern void problem_1_e(){
 
     DFA_set_accepting(problem1e, 2, true);
 
+//while loop keeps making user enter input until they type quit
     while (1) {
         DFA_set_current_state(problem1e, 0);
         char *input = malloc(64*sizeof(char));
@@ -316,15 +329,7 @@ extern void problem_1_e(){
         }
     }
     printf("\n");
+    DFA_free(problem1e);
 }
-
-/*int main(int argc, char* argv[]) {
-    problem_1_a();
-    problem_1_b();
-    problem_1_c();
-    problem_1_d();
-    problem_1_e();
-
-}*/
 
 #endif

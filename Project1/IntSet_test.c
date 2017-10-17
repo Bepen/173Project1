@@ -1,4 +1,10 @@
 /*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
+/*
  * File: IntSet_test.c
  * Creator: George Ferguson
  * Created: Wed Sep  7 17:58:24 2016

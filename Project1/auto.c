@@ -1,3 +1,9 @@
+/*
+ * CSC173 Project 1
+ * Created By Sailesh Kaveti, Ryan Racicot, Bepen Neupane
+ * Net ID: skaveti, rracico3, bneupane
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -6,6 +12,7 @@
 #include "IntSet.h"
 #include "nfa.h"
 
+//runs all of the problems
 int main(int argc, char* argv[]) {
     printf("\n");
     problem_1_a();
